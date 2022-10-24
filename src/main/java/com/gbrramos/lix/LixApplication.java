@@ -10,4 +10,6 @@ public class LixApplication {
 		SpringApplication.run(LixApplication.class, args);
 	}
 
+	
+
 }
