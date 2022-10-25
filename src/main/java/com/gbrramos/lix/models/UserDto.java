@@ -5,6 +5,7 @@ public class UserDto {
     private String email;
     private String name;
     private String role;
+    private String jwtToken;
     // private long company;
    
     public String getEmail() {
@@ -24,6 +25,13 @@ public class UserDto {
     }
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getJwtToken() {
+        return jwtToken;
+    }
+    public void setJwtToken(String jwtToken) {
+        this.jwtToken = jwtToken;
     }
    
     
