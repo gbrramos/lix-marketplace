@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,6 +13,7 @@ import com.gbrramos.lix.models.User;
 import com.gbrramos.lix.models.UserDto;
 import com.gbrramos.lix.repositories.IUserRepository;
 
+@Controller
 @RestController
 public class UserController {
 
@@ -21,12 +23,8 @@ public class UserController {
     @Autowired
     private IUserRepository userRepository;
 
-    UserController(IUserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
     @Bean
-    private UserDto geraUsuarioBase() throws Exception {
+    private void geraUsuarioBase() {
         
         User user = new User();
         user.setName("Admin");
@@ -36,11 +34,5 @@ public class UserController {
         
         userRepository.save(user);
 
-        UserDto res = new UserDto();
-        res.setEmail(user.getEmail());
-        res.setName(user.getName());
-        res.setRole(user.getRole());
-
-        return res;
     }
 }
