@@ -32,14 +32,17 @@ public class UserController {
     @Bean
     private void geraUsuarioBase() {
         
-        User user = new User();
-        user.setName("Admin");
-        user.setEmail("admin@base.com");
-        user.setUsername("admin@base.com");
-        user.setRole("base");
-        user.setPassword(passwordEncoder.encode("123456"));
-        
-        userRepository.save(user);
+        List<User> lUsers = userRepository.findByEmail("admin@base.com");
+
+        if(lUsers.size() <= 0) {
+            User user = new User();
+            user.setName("Admin");
+            user.setEmail("admin@base.com");
+            user.setRole("base");
+            user.setPassword(passwordEncoder.encode("123456"));
+            
+            userRepository.save(user);
+        }
 
     }
 
@@ -60,7 +63,6 @@ public class UserController {
         User user = new User();
 
         user.setEmail(regUser.getEmail());
-        user.setUsername(regUser.getEmail());
         user.setName(regUser.getName());
         user.setPassword(passwordEncoder.encode(regUser.getPassword()));
         user.setCompany_id(1);
