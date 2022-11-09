@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,23 +54,54 @@ public class UserController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<?> getById(@PathVariable long id) {
+    public ResponseEntity<Optional<User>> getById(@PathVariable long id) throws Exception {
         Optional<User> user = userRepository.findById(id);
+
+        if(!user.isPresent()) 
+            throw new Exception("User not found");
+        
         return new ResponseEntity<Optional<User>>(user, null, 200);
     }
 
     @PostMapping
-    public ResponseEntity<?> post(@RequestBody User regUser) {
+    public ResponseEntity<User> post(@RequestBody User regUser) throws Exception {
         User user = new User();
 
-        user.setEmail(regUser.getEmail());
-        user.setName(regUser.getName());
-        user.setPassword(passwordEncoder.encode(regUser.getPassword()));
-        user.setCompany_id(1);
-        user.setRole(regUser.getRole());
+        try {
 
-        userRepository.save(user);
+            user.setEmail(regUser.getEmail());
+            user.setName(regUser.getName());
+            user.setPassword(passwordEncoder.encode(regUser.getPassword()));
+            user.setCompany_id(1);
+            user.setRole(regUser.getRole());
+    
+            userRepository.save(user);
+    
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+       
+        return new ResponseEntity<User>(user, null, 200);
+    }
 
-        return new ResponseEntity<String>("ok", null, 200);
+    @PutMapping
+    public ResponseEntity<User> update(@RequestBody User regUser) throws Exception {
+        User user = new User();
+
+        try {
+
+            user.setEmail(regUser.getEmail());
+            user.setName(regUser.getName());
+            user.setPassword(passwordEncoder.encode(regUser.getPassword()));
+            user.setCompany_id(1);
+            user.setRole(regUser.getRole());
+    
+            userRepository.save(user);
+    
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+       
+        return new ResponseEntity<User>(user, null, 200);
     }
 }
