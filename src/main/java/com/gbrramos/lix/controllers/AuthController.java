@@ -1,5 +1,7 @@
 package com.gbrramos.lix.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.gbrramos.lix.models.ExceptionResponse;
 import com.gbrramos.lix.models.JwtRequest;
 import com.gbrramos.lix.models.JwtResponse;
+import com.gbrramos.lix.models.User;
+import com.gbrramos.lix.repositories.IUserRepository;
 import com.gbrramos.lix.services.JwtUserDetailService;
 import com.gbrramos.lix.utils.TokenService;
 
@@ -29,6 +33,9 @@ public class AuthController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private IUserRepository userRepository;
     
     @Autowired
     private TokenService tokenService;
@@ -42,10 +49,10 @@ public class AuthController {
         } catch (BadCredentialsException e) {
             return new ResponseEntity<ExceptionResponse>(new ExceptionResponse(e.getMessage(), 500), null, 500);
         }
-
         final UserDetails userDetails = userDetailService.loadUserByUsername(request.getUsername());
+        List<User> user = userRepository.findByEmail(request.getUsername());
         final String jwtToken = tokenService.generateJwtToken(userDetails);
-        return ResponseEntity.ok(new JwtResponse(jwtToken));
+        return ResponseEntity.ok(new JwtResponse(jwtToken, user.get(0)));
 
     }
     
