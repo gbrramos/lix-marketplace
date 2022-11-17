@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +31,22 @@ public class UserController {
     @Autowired
     private IUserRepository userRepository;
 
+    // @Autowired
+    // TestService testService;
+
+    // @Autowired
+    // UserService userService;
+
+    // @Autowired
+    // private JwtTokenUtil jwtTokenUtil;
+
+    // @RequestMapping(value="/test", method = RequestMethod.GET, produces = "application/json")
+    // @ResponseBody
+    // public List<Test> getTestsListByUserId(HttpServletRequest req){
+    //     String token = req.getHeader(HEADER_STRING).replace(TOKEN_PREFIX,"");
+    //     return testService.findByUserId(userService.findByUsername(jwtTokenUtil.getUsernameFromToken(token)));
+    // }
+
     @Bean
     private void geraUsuarioBase() {
         
@@ -48,7 +65,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<?> listUsers() {
+    public ResponseEntity<List<User>> listUsers() {
         List<User> lUsers = userRepository.findAll();
         return new ResponseEntity<List<User>>(lUsers, null, 200);
     }
@@ -84,12 +101,12 @@ public class UserController {
         return new ResponseEntity<User>(user, null, 200);
     }
 
-    @PutMapping
-    public ResponseEntity<User> update(@RequestBody User regUser) throws Exception {
+    @PutMapping("{id}")
+    public ResponseEntity<User> update(@RequestBody User regUser, @PathVariable long id) throws Exception {
         User user = new User();
 
         try {
-
+            user.setId(id);
             user.setEmail(regUser.getEmail());
             user.setName(regUser.getName());
             user.setPassword(passwordEncoder.encode(regUser.getPassword()));
@@ -103,5 +120,12 @@ public class UserController {
         }
        
         return new ResponseEntity<User>(user, null, 200);
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<String> delete(@PathVariable long id) {
+        userRepository.deleteById(id);
+
+        return new ResponseEntity<String>("ok", null, 200);
     }
 }
