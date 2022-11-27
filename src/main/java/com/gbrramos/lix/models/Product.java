@@ -12,7 +12,7 @@ public class Product{
     private String name;
     private String description;
     private Double price;
-    private Double special_price;
+    private Double specialPrice;
     private String code;
 
     public long getId() {
@@ -39,11 +39,11 @@ public class Product{
     public void setPrice(Double price) {
         this.price = price;
     }
-    public Double getSpecial_price() {
-        return special_price;
+    public Double getSpecialPrice() {
+        return specialPrice;
     }
-    public void setSpecial_price(Double special_price) {
-        this.special_price = special_price;
+    public void setSpecialPrice(Double specialPrice) {
+        this.specialPrice = specialPrice;
     }
     public String getCode() {
         return code;
