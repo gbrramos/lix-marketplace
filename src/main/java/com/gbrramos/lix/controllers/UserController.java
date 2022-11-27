@@ -47,8 +47,9 @@ public class UserController {
     //     return testService.findByUserId(userService.findByUsername(jwtTokenUtil.getUsernameFromToken(token)));
     // }
 
+    // Create the first user when API is executed
     @Bean
-    private void geraUsuarioBase() {
+    private void createBaseUser() {
         
         List<User> lUsers = userRepository.findByEmail("admin@base.com");
 
@@ -64,12 +65,14 @@ public class UserController {
 
     }
 
+    // Get all users
     @GetMapping
     public ResponseEntity<List<User>> listUsers() {
         List<User> lUsers = userRepository.findAll();
         return new ResponseEntity<List<User>>(lUsers, null, 200);
     }
 
+    // Get user by id
     @GetMapping("{id}")
     public ResponseEntity<Optional<User>> getById(@PathVariable long id) throws Exception {
         Optional<User> user = userRepository.findById(id);
@@ -80,6 +83,7 @@ public class UserController {
         return new ResponseEntity<Optional<User>>(user, null, 200);
     }
 
+    // create user
     @PostMapping
     public ResponseEntity<User> post(@RequestBody User regUser) throws Exception {
         User user = new User();
@@ -101,6 +105,7 @@ public class UserController {
         return new ResponseEntity<User>(user, null, 200);
     }
 
+    // update user
     @PutMapping("{id}")
     public ResponseEntity<User> update(@RequestBody User regUser, @PathVariable long id) throws Exception {
         User user = new User();
@@ -122,6 +127,7 @@ public class UserController {
         return new ResponseEntity<User>(user, null, 200);
     }
 
+    // destroy user
     @DeleteMapping("{id}")
     public ResponseEntity<String> delete(@PathVariable long id) {
         userRepository.deleteById(id);

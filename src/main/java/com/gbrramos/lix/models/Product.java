@@ -1,12 +1,10 @@
 package com.gbrramos.lix.models;
 
-import java.io.Serializable;
-
 import javax.persistence.*;
 
 @Entity
 @Table(name = "product")
-public class Product implements Serializable{
+public class Product{
 
     @GeneratedValue
     @Id
@@ -15,6 +13,7 @@ public class Product implements Serializable{
     private String description;
     private Double price;
     private Double special_price;
+    private String code;
 
     public long getId() {
         return id;
@@ -45,6 +44,12 @@ public class Product implements Serializable{
     }
     public void setSpecial_price(Double special_price) {
         this.special_price = special_price;
+    }
+    public String getCode() {
+        return code;
+    }
+    public void setCode(String code) {
+        this.code = code;
     }
 
 }
