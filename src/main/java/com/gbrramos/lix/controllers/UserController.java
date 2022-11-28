@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gbrramos.lix.models.JsonResponse;
 import com.gbrramos.lix.models.User;
 import com.gbrramos.lix.repositories.IUserRepository;
 
@@ -67,71 +68,49 @@ public class UserController {
 
     // Get all users
     @GetMapping
-    public ResponseEntity<List<User>> listUsers() {
-        List<User> lUsers = userRepository.findAll();
-        return new ResponseEntity<List<User>>(lUsers, null, 200);
+    public ResponseEntity<JsonResponse> listProducts() {
+        List<User> lProducts = userRepository.findAll();
+        return new ResponseEntity<JsonResponse>(new JsonResponse("Ok", 200, lProducts), null, 200);
     }
 
-    // Get user by id
     @GetMapping("{id}")
-    public ResponseEntity<Optional<User>> getById(@PathVariable long id) throws Exception {
+    public ResponseEntity<JsonResponse> getProduct(@PathVariable long id) throws Exception {
         Optional<User> user = userRepository.findById(id);
 
         if(!user.isPresent()) 
-            throw new Exception("User not found");
-        
-        return new ResponseEntity<Optional<User>>(user, null, 200);
+            return new ResponseEntity<JsonResponse> (new JsonResponse("User not found", 404, user), null, 404);
+
+        return new ResponseEntity<JsonResponse>(new JsonResponse("ok", 200, user), null, 200);
     }
 
-    // create user
     @PostMapping
-    public ResponseEntity<User> post(@RequestBody User regUser) throws Exception {
-        User user = new User();
-
+    public ResponseEntity<JsonResponse> post(@RequestBody User rUser) throws Exception  {
         try {
-
-            user.setEmail(regUser.getEmail());
-            user.setName(regUser.getName());
-            user.setPassword(passwordEncoder.encode(regUser.getPassword()));
-            user.setCompany_id(1);
-            user.setRole(regUser.getRole());
-    
-            userRepository.save(user);
-    
+            userRepository.save(rUser);
         } catch (Exception e) {
-            throw new Exception(e.getMessage());
+            return new ResponseEntity<JsonResponse>(new JsonResponse(e.getMessage(), 500, null), null, 500);
         }
-       
-        return new ResponseEntity<User>(user, null, 200);
+        return new ResponseEntity<JsonResponse>(new JsonResponse("User created successfully", 200, rUser), null, 200);
     }
 
-    // update user
     @PutMapping("{id}")
-    public ResponseEntity<User> update(@RequestBody User regUser, @PathVariable long id) throws Exception {
-        User user = new User();
-
+    public ResponseEntity<JsonResponse> update (@PathVariable long id, @RequestBody User rUser) {
         try {
-            user.setId(id);
-            user.setEmail(regUser.getEmail());
-            user.setName(regUser.getName());
-            user.setPassword(passwordEncoder.encode(regUser.getPassword()));
-            user.setCompany_id(1);
-            user.setRole(regUser.getRole());
-    
-            userRepository.save(user);
-    
+            rUser.setId(id);
+            userRepository.save(rUser);
         } catch (Exception e) {
-            throw new Exception(e.getMessage());
+            return new ResponseEntity<JsonResponse>(new JsonResponse(e.getMessage(), 500, null), null, 500);
         }
-       
-        return new ResponseEntity<User>(user, null, 200);
-    }
+        return new ResponseEntity<JsonResponse>(new JsonResponse("ok", 200, rUser), null, 200);
+    } 
 
-    // destroy user
     @DeleteMapping("{id}")
-    public ResponseEntity<String> delete(@PathVariable long id) {
-        userRepository.deleteById(id);
-
-        return new ResponseEntity<String>("ok", null, 200);
+    public ResponseEntity<JsonResponse> destroy (@PathVariable long id) {
+        try {
+            userRepository.deleteById(id);
+        } catch (Exception e) {
+            return new ResponseEntity<JsonResponse>(new JsonResponse(e.getMessage(), 500, null), null, 500);
+        }
+        return new ResponseEntity<JsonResponse>(new JsonResponse("User deleted successfully", 200, null), null, 200);
     }
 }

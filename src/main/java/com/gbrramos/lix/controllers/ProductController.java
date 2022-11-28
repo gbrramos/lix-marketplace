@@ -44,13 +44,13 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<Product> post(@RequestBody Product rProduct) throws Exception  {
+    public ResponseEntity<JsonResponse> post(@RequestBody Product rProduct) throws Exception  {
         try {
             productRepository.save(rProduct);
         } catch (Exception e) {
-            throw new Exception(e.getMessage());
+            return new ResponseEntity<JsonResponse>(new JsonResponse(e.getMessage(), 500, null), null, 500);
         }
-        return new ResponseEntity<Product>(rProduct, null, 200);
+        return new ResponseEntity<JsonResponse>(new JsonResponse("ok", 200, rProduct), null, 200);
     }
 
     @PutMapping("{id}")
