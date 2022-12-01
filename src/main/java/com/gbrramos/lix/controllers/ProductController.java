@@ -1,10 +1,8 @@
 package com.gbrramos.lix.controllers;
 
-import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gbrramos.lix.models.JsonResponse;
+import com.gbrramos.lix.models.ProductDTO;
 import com.gbrramos.lix.models.Product;
 import com.gbrramos.lix.repositories.IProductRepository;
 
@@ -29,49 +28,71 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<JsonResponse> listProducts() {
-        List<Product> lProducts = productRepository.findAll();
-        return new ResponseEntity<JsonResponse>(new JsonResponse("Ok", 200, lProducts), null, 200);
+        try {
+            List<Product> lProducts = productRepository.findAll();
+            return new ResponseEntity<>(new JsonResponse("Ok", 200, lProducts), null, 200);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new JsonResponse(e.getMessage(), 404, null), null, 404);
+        }
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<JsonResponse> getProduct(@PathVariable long id) throws Exception {
-        Optional<Product> product = productRepository.findById(id);
-
-        if(!product.isPresent()) 
-            return new ResponseEntity<JsonResponse> (new JsonResponse("Product not found", 404, product), null, 404);
-
-        return new ResponseEntity<JsonResponse>(new JsonResponse("ok", 200, product), null, 200);
+    public ResponseEntity<JsonResponse> getProduct(@PathVariable long id) {
+        try {
+            Optional<Product> product = productRepository.findById(id);
+            return new ResponseEntity<>(new JsonResponse("ok", 200, product), null, 200);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new JsonResponse(e.getMessage(), 404, null), null, 404);
+        }
     }
 
     @PostMapping
-    public ResponseEntity<JsonResponse> post(@RequestBody Product rProduct) throws Exception  {
+    public ResponseEntity<JsonResponse> post(@RequestBody ProductDTO product) {
         try {
-            productRepository.save(rProduct);
+            Product persistProduct = new Product();
+
+            persistProduct.setCode(product.getCode());
+            persistProduct.setDescription(product.getDescription());
+            persistProduct.setName(product.getName());
+            persistProduct.setPrice(product.getPrice());
+            persistProduct.setSpecialPrice(product.getSpecialPrice());
+
+            productRepository.save(persistProduct);
+
+            return new ResponseEntity<>(new JsonResponse("Product not found", 404, product), null, 404);
         } catch (Exception e) {
-            return new ResponseEntity<JsonResponse>(new JsonResponse(e.getMessage(), 500, null), null, 500);
+            return new ResponseEntity<>(new JsonResponse("Product not found", 404, product), null, 404);
         }
-        return new ResponseEntity<JsonResponse>(new JsonResponse("ok", 200, rProduct), null, 200);
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<JsonResponse> update (@PathVariable long id, @RequestBody Product rProduct) {
+    public ResponseEntity<JsonResponse> update(@PathVariable long id, @RequestBody ProductDTO product) {
         try {
-            rProduct.setId(id);
-            productRepository.save(rProduct);
+            Product persistProduct = new Product();
+
+            persistProduct.setCode(product.getCode());
+            persistProduct.setDescription(product.getDescription());
+            persistProduct.setName(product.getName());
+            persistProduct.setPrice(product.getPrice());
+            persistProduct.setSpecialPrice(product.getSpecialPrice());
+            persistProduct.setId(id);
+
+            productRepository.save(persistProduct);
+
+            return new ResponseEntity<>(new JsonResponse("ok", 200, persistProduct), null, 200);
         } catch (Exception e) {
-            return new ResponseEntity<JsonResponse>(new JsonResponse(e.getMessage(), 500, null), null, 500);
+            return new ResponseEntity<>(new JsonResponse(e.getMessage(), 500, null), null, 500);
         }
-        return new ResponseEntity<JsonResponse>(new JsonResponse("ok", 200, rProduct), null, 200);
-    } 
+    }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<JsonResponse> destroy (@PathVariable long id) {
+    public ResponseEntity<JsonResponse> destroy(@PathVariable long id) {
         try {
             productRepository.deleteById(id);
+            return new ResponseEntity<>(new JsonResponse("Product deleted successfully", 200, null), null, 200);
         } catch (Exception e) {
-            return new ResponseEntity<JsonResponse>(new JsonResponse(e.getMessage(), 500, null), null, 500);
+            return new ResponseEntity<>(new JsonResponse(e.getMessage(), 500, null), null, 500);
         }
-        return new ResponseEntity<JsonResponse>(new JsonResponse("Product deleted successfully", 200, null), null, 200);
     }
-    
+
 }
