@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gbrramos.lix.models.JsonResponse;
 import com.gbrramos.lix.models.User;
+import com.gbrramos.lix.models.UserDTO;
 import com.gbrramos.lix.repositories.IUserRepository;
 
 @Controller
@@ -32,35 +33,33 @@ public class UserController {
     @Autowired
     private IUserRepository userRepository;
 
-    // @Autowired
-    // TestService testService;
-
-    // @Autowired
-    // UserService userService;
-
-    // @Autowired
-    // private JwtTokenUtil jwtTokenUtil;
-
-    // @RequestMapping(value="/test", method = RequestMethod.GET, produces = "application/json")
-    // @ResponseBody
-    // public List<Test> getTestsListByUserId(HttpServletRequest req){
-    //     String token = req.getHeader(HEADER_STRING).replace(TOKEN_PREFIX,"");
-    //     return testService.findByUserId(userService.findByUsername(jwtTokenUtil.getUsernameFromToken(token)));
-    // }
-
-    // Create the first user when API is executed
     @Bean
     private void createBaseUser() {
-        
+
+        /**
+         *         This function is a Bean because it need to run when the code is
+         *         executed
+         *         This function creates a user with the following properties:
+         *         {
+         *         name: "Admin",
+         *         email: "admin@base.com",
+         *         role: "base",
+         *         password: "123456",
+         *         }
+         * 
+         *         Use this user to run the first requisition on API and create new 
+         *         users
+         */
+
         List<User> lUsers = userRepository.findByEmail("admin@base.com");
 
-        if(lUsers.size() <= 0) {
+        if (lUsers.isEmpty()) {
             User user = new User();
             user.setName("Admin");
             user.setEmail("admin@base.com");
             user.setRole("base");
             user.setPassword(passwordEncoder.encode("123456"));
-            
+
             userRepository.save(user);
         }
 
@@ -70,47 +69,68 @@ public class UserController {
     @GetMapping
     public ResponseEntity<JsonResponse> listProducts() {
         List<User> lProducts = userRepository.findAll();
-        return new ResponseEntity<JsonResponse>(new JsonResponse("Ok", 200, lProducts), null, 200);
+        return new ResponseEntity<>(new JsonResponse("Ok", 200, lProducts), null, 200);
     }
 
+    // Get user by id
     @GetMapping("{id}")
-    public ResponseEntity<JsonResponse> getProduct(@PathVariable long id) throws Exception {
+    public ResponseEntity<JsonResponse> getProduct(@PathVariable long id) {
         Optional<User> user = userRepository.findById(id);
 
-        if(!user.isPresent()) 
-            return new ResponseEntity<JsonResponse> (new JsonResponse("User not found", 404, user), null, 404);
+        if (!user.isPresent())
+            return new ResponseEntity<>(new JsonResponse("User not found", 404, user), null, 404);
 
-        return new ResponseEntity<JsonResponse>(new JsonResponse("ok", 200, user), null, 200);
+        return new ResponseEntity<>(new JsonResponse("ok", 200, user), null, 200);
     }
 
+    // Create user
     @PostMapping
-    public ResponseEntity<JsonResponse> post(@RequestBody User rUser) throws Exception  {
+    public ResponseEntity<JsonResponse> post(@RequestBody UserDTO user) {
         try {
-            userRepository.save(rUser);
+            User persistUser = new User();
+
+            persistUser.setEmail(user.getEmail());
+            persistUser.setName(user.getName());
+            persistUser.setPassword(passwordEncoder.encode(user.getPassword()));
+            persistUser.setRole(user.getRole());
+
+            userRepository.save(persistUser);
+
+            return new ResponseEntity<>(new JsonResponse("User created successfully", 200, persistUser), null, 200);
         } catch (Exception e) {
-            return new ResponseEntity<JsonResponse>(new JsonResponse(e.getMessage(), 500, null), null, 500);
+            return new ResponseEntity<>(new JsonResponse(e.getMessage(), 500, null), null, 500);
         }
-        return new ResponseEntity<JsonResponse>(new JsonResponse("User created successfully", 200, rUser), null, 200);
     }
 
+    // Update user
     @PutMapping("{id}")
-    public ResponseEntity<JsonResponse> update (@PathVariable long id, @RequestBody User rUser) {
+    public ResponseEntity<JsonResponse> update(@PathVariable long id, @RequestBody UserDTO user) {
         try {
-            rUser.setId(id);
-            userRepository.save(rUser);
-        } catch (Exception e) {
-            return new ResponseEntity<JsonResponse>(new JsonResponse(e.getMessage(), 500, null), null, 500);
-        }
-        return new ResponseEntity<JsonResponse>(new JsonResponse("ok", 200, rUser), null, 200);
-    } 
+            User persistUser = new User();
 
+            persistUser.setEmail(user.getEmail());
+            persistUser.setName(user.getName());
+            persistUser.setPassword(passwordEncoder.encode(user.getPassword()));
+            persistUser.setRole(user.getRole());
+            persistUser.setId(id);
+
+            userRepository.save(persistUser);
+
+            return new ResponseEntity<>(new JsonResponse("ok", 200, persistUser), null, 200);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(new JsonResponse(e.getMessage(), 500, null), null, 500);
+        }
+    }
+
+    // Delete user
     @DeleteMapping("{id}")
-    public ResponseEntity<JsonResponse> destroy (@PathVariable long id) {
+    public ResponseEntity<JsonResponse> destroy(@PathVariable long id) {
         try {
             userRepository.deleteById(id);
+            return new ResponseEntity<>(new JsonResponse("User deleted successfully", 200, null), null, 200);
         } catch (Exception e) {
-            return new ResponseEntity<JsonResponse>(new JsonResponse(e.getMessage(), 500, null), null, 500);
+            return new ResponseEntity<>(new JsonResponse(e.getMessage(), 500, null), null, 500);
         }
-        return new ResponseEntity<JsonResponse>(new JsonResponse("User deleted successfully", 200, null), null, 200);
     }
 }

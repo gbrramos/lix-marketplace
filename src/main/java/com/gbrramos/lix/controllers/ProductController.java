@@ -40,7 +40,7 @@ public class ProductController {
     public ResponseEntity<JsonResponse> getProduct(@PathVariable long id) {
         try {
             Optional<Product> product = productRepository.findById(id);
-            return new ResponseEntity<>(new JsonResponse("ok", 200, product), null, 200);
+            return new ResponseEntity<>(new JsonResponse("Ok", 200, product), null, 200);
         } catch (Exception e) {
             return new ResponseEntity<>(new JsonResponse(e.getMessage(), 404, null), null, 404);
         }
@@ -59,7 +59,7 @@ public class ProductController {
 
             productRepository.save(persistProduct);
 
-            return new ResponseEntity<>(new JsonResponse("Product not found", 404, product), null, 404);
+            return new ResponseEntity<>(new JsonResponse("Product created successfully", 200, persistProduct), null, 200);
         } catch (Exception e) {
             return new ResponseEntity<>(new JsonResponse("Product not found", 404, product), null, 404);
         }
@@ -79,7 +79,7 @@ public class ProductController {
 
             productRepository.save(persistProduct);
 
-            return new ResponseEntity<>(new JsonResponse("ok", 200, persistProduct), null, 200);
+            return new ResponseEntity<>(new JsonResponse("Product updated successfully", 200, persistProduct), null, 200);
         } catch (Exception e) {
             return new ResponseEntity<>(new JsonResponse(e.getMessage(), 500, null), null, 500);
         }

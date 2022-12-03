@@ -16,7 +16,6 @@ public class User {
     private String password;
     private String name;
     private String role;
-    private long company_id;
 
     public long getId() {
         return id;
@@ -47,11 +46,5 @@ public class User {
     }
     public void setRole(String role) {
         this.role = role;
-    }
-    public long getCompany_id() {
-        return company_id;
-    }
-    public void setCompany_id(long company_id) {
-        this.company_id = company_id;
     }
 }
